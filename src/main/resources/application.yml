@@ -1,0 +1,15 @@
+spring:
+    application:
+      name: sparkker
+server:
+  port: 8988 
+
+---
+
+spring:
+   profiles: default
+eureka:
+    password: user
+    client:
+        serviceUrl:
+            defaultZone: http://user:${eureka.password}@localhost:9999/eureka/
