@@ -10,5 +10,6 @@ public class SparkkerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SparkkerApplication.class, args);
+		
 	}
 }

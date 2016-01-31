@@ -5,8 +5,8 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableEurekaClient
-@EnableFeignClients
+//@EnableEurekaClient
+//@EnableFeignClients
 public class SparkkerConfig {
 
 	

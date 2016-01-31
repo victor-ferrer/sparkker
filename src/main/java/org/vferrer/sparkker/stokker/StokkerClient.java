@@ -17,6 +17,4 @@ public interface StokkerClient {
 		
 		@RequestMapping(method = RequestMethod.GET, value = "/stockQuotationJPAs/search/findTopByStockOrderByTimestampDesc")
 		StockQuotation getLastStockPrice(@RequestParam("ticker") String stock);
-
-	
 }
