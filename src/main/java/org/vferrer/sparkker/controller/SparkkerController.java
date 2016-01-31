@@ -35,7 +35,7 @@ public class SparkkerController {
 	// }
 
 	@RequestMapping("/analyzeStock")
-	public List<Double> analyzeQuote(@Param("ticker") String ticker) throws IOException {
+	public List<StockQuotation> analyzeQuote() throws IOException {
 		// List<StockQuotation> quotations =
 		// stokkerClient.getAllStockQuotations(ticker);
 		//
@@ -57,6 +57,6 @@ public class SparkkerController {
 //
 //		StockQuotation[] body = responseEntity.getBody();
 
-		return analyzeService.analyzeStockQuotations(30);
+		return analyzeService.analyzeStockQuotations(200);
 	}
 }

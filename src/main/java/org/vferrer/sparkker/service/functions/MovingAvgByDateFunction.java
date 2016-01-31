@@ -1,4 +1,4 @@
-package org.vferrer.sparkker.service;
+package org.vferrer.sparkker.service.functions;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -36,7 +36,4 @@ public class MovingAvgByDateFunction implements PairFunction<Object,Date,Double>
 
 		return new Tuple2<Date, Double>(stockList.get(0).getTimestamp(),result);
 	}
-
-	
-
 }
