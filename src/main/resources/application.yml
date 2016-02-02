@@ -5,7 +5,6 @@ server:
   port: 8988 
 
 ---
-
 spring:
    profiles: default
 eureka:
@@ -13,3 +12,4 @@ eureka:
     client:
         serviceUrl:
             defaultZone: http://user:${eureka.password}@localhost:9999/eureka/
+         
