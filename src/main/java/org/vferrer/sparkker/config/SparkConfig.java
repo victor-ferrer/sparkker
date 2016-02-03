@@ -22,7 +22,7 @@ public class SparkConfig
 		SparkConf conf = new SparkConf().setAppName("Sparkker")
 		                                .setMaster(master)
 		                                .set("spark.executor.memory", "128m")
-		                                .set("spark.cores.max", "1")
+		                                .set("spark.cores.max", "2")
 		                                .set("spark.default.parallelism", "3");
 
 		return new JavaSparkContext(conf);

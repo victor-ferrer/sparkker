@@ -1,13 +1,9 @@
 package org.vferrer.sparkker.service;
 
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -16,11 +12,8 @@ import org.apache.spark.mllib.rdd.RDDFunctions;
 import org.apache.spark.rdd.RDD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.vferrer.sparkker.service.functions.ConvertLineToStockQuotation;
 import org.vferrer.sparkker.service.functions.MovingAvgByDateFunction;
 import org.vferrer.sparkker.stokker.StockQuotation;
-
-import com.google.common.base.Preconditions;
 
 import scala.Tuple2;
 import scala.reflect.ClassTag;
@@ -31,29 +24,12 @@ public class AnalyzeService
 	@Autowired
 	private JavaSparkContext  sc;
 	
-	private String filePath;
-	
-	
-	@PostConstruct
-	public void init(){
-		URL url = AnalyzeService.class.getResource("/sampleData/dump.txt");
-		Preconditions.checkNotNull(url, "Sample data file counld not be found in this URL: /sampleData/dump.txt");
-		
-		filePath = url.getPath();
-	}
-
-	
-	
 	/**
-	 * FIXME It just calculates the moving average per date of a stock stored in text file 
+	 * FIXME It just calculates the moving average of a stock list given as input
 	 */
-	public List<StockQuotation> analyzeStockQuotations(int slidingWindow) throws IOException
+	public List<StockQuotation> analyzeStockQuotations(List<StockQuotation> stocks, int slidingWindow) throws IOException
 	{
-		// Read the sample file
-		JavaRDD<String> linesRDD = sc.textFile(filePath);
-		
-		// Convert the lines to our business objects
-		JavaRDD<StockQuotation> quotationsRDD = linesRDD.flatMap(new ConvertLineToStockQuotation());
+		JavaRDD<StockQuotation> quotationsRDD = sc.parallelize(stocks);
 
 		// Instantiate the RDDFunctions object
 		ClassTag<StockQuotation> classTag = scala.reflect.ClassManifestFactory.fromClass(StockQuotation.class);
@@ -68,7 +44,7 @@ public class AnalyzeService
 		List<StockQuotation> toReturn = new ArrayList<>();
 		for (Tuple2<Date, Double> tuple2 : smaPerDateList) {
 			StockQuotation stock = new StockQuotation();
-			stock.setStock("MAP.MC");
+			stock.setStock(stocks.get(0).getStock());
 			stock.setTimestamp(tuple2._1);
 			stock.setValue(tuple2._2);
 			toReturn.add(stock);
