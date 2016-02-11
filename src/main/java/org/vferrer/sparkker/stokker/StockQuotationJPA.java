@@ -1,16 +1,18 @@
 package org.vferrer.sparkker.stokker;
 
 import java.io.Serializable;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Simple POJO class holding the values returned by Stokker for a Stock Quotation
  * @author efevict
  *
  */
-public class StockQuotation implements Serializable
+@JsonIgnoreProperties(value={"_links","link"})
+public class StockQuotationJPA implements Serializable
 {
 	
 	/**
@@ -44,14 +46,14 @@ public class StockQuotation implements Serializable
 		this.timestamp = timestamp;
 	}
 	
-	public static StockQuotation fromLine(String line) throws Exception{
+	public static StockQuotationJPA fromLine(String line) throws Exception{
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS.S");
 		
 		// REP.MC,9.49,2016-01-29 17:36:00.0
 		String[] chunks = line.split(",");
 		
-		StockQuotation toReturn = new StockQuotation();
+		StockQuotationJPA toReturn = new StockQuotationJPA();
 		toReturn.setStock(chunks[0]);
 		toReturn.setValue(Double.parseDouble(chunks[1]));
 		toReturn.setTimestamp(sdf.parse(chunks[2]));
@@ -59,12 +61,11 @@ public class StockQuotation implements Serializable
 		return toReturn;
 	}
 	
-	public static String toLine(StockQuotation stock)
+	public static String toLine(StockQuotationJPA stock)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS.S");
 		
 		return String.format("%s;%s;%s", stock.getStock(), sdf.format(stock.getTimestamp()), stock.getValue().toString());
 	}
-	
 
 }
