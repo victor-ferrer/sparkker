@@ -11,6 +11,7 @@ import org.apache.spark.rdd.RDD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.vferrer.sparkker.service.functions.IndicatorFunction;
+import org.vferrer.sparkker.service.functions.SortByDateFunction;
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
 import org.vferrer.sparkker.stokker.Indicator;
 import org.vferrer.sparkker.stokker.StockQuotationJPA;
@@ -33,7 +34,10 @@ public class AnalyzeService
 	public List<AnalizedStockQuotation> analyzeStockQuotations(List<StockQuotationJPA> stocks, Set<Indicator> indicators) throws IOException
 	{
 		JavaRDD<StockQuotationJPA> quotationsRDD = sc.parallelize(stocks);
-		quotationsRDD.cache();
+		
+		// Sort the records ascending
+		JavaRDD<StockQuotationJPA> sortedQuotationsRDD = quotationsRDD.sortBy(new SortByDateFunction(),false,1);
+		sortedQuotationsRDD.cache();
 		
 		// Instantiate the RDDFunctions object
 		ClassTag<StockQuotationJPA> classTag = scala.reflect.ClassManifestFactory.fromClass(StockQuotationJPA.class);

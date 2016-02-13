@@ -3,7 +3,9 @@ spring:
       name: sparkker
 server:
   port: 8988 
-
+data:
+  feed:
+     online: true
 ---
 spring:
    profiles: default

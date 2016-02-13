@@ -31,7 +31,7 @@ public class IndicatorFunction implements Function<Object,AnalizedStockQuotation
 		
 		AnalizedStockQuotation toReturn = new AnalizedStockQuotation(stockList.get(0));
 		
-		indicators.forEach(indicator -> toReturn.getIndicators().add(indicator.clone().calculate(stockList)) );
+		indicators.forEach(indicator -> toReturn.getIndicators().put(indicator.getName(),indicator.clone().calculate(stockList)) );
 		
 		return toReturn;
 	}

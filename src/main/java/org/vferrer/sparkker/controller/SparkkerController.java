@@ -2,6 +2,7 @@ package org.vferrer.sparkker.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -23,58 +24,123 @@ import org.vferrer.sparkker.stokker.Indicator.Granularity;
 import org.vferrer.sparkker.stokker.StockQuotationJPA;
 import org.vferrer.sparkker.stokker.StockQuotationJPAPagedResources;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 @RestController
 public class SparkkerController {
 
-//	@Autowired
-//	 private StokkerClient stokkerClient;
+	// @Autowired
+	// private StokkerClient stokkerClient;
 
 	@Autowired
 	RestTemplate rt;
-	
+
 	@Value("${eureka.client.serviceUrl.defaultZone}")
 	String baseEurekaPath;
-	
+
 	@Autowired
 	private AnalyzeService analyzeService;
 
-	@RequestMapping("/analyzeStock")
-	public List<AnalizedStockQuotation> analyzeQuote(String ticker) throws IOException 
-	{
+	@Value("${data.feed.online}")
+	private boolean useOnlineFeed;
 
-		String url = String.format("http://localhost:8989/stockQuotationJPAs/search/findValueByStock?ticker=%s",ticker);
-		
-		try {
-			ResponseEntity<StockQuotationJPAPagedResources> response = rt.getForEntity(url,StockQuotationJPAPagedResources.class);
-			
-			System.out.println(response.getStatusCode());
-			
-			if (HttpStatus.OK == response.getStatusCode()){
-				
-				List<StockQuotationJPA> stocks = new ArrayList<>(response.getBody().getContent());
-				
-				System.out.println("Retrived stock quoations count: " + stocks.size());
-				
-				Set<Indicator> indicators = new HashSet<>();
-				indicators.add(IndicatorsFactory.max(Granularity.DAY, 200));
-				indicators.add(IndicatorsFactory.sma(Granularity.DAY, 200));
-				
-				return analyzeService.analyzeStockQuotations(stocks,indicators);
-			}
-			else {
-				System.out.println("Error retrieving the stock quotations: " + response.getStatusCode());
-				return Collections.emptyList();
-			}
-		}
-		catch(RestClientException rex){
-			System.out.println("Error retrieving the stock quotations: " + rex.getMessage());
-			return Collections.emptyList();
-		}
+	@RequestMapping("/analyzeStock")
+	public ChartData analyzeQuote(String ticker) throws IOException {
+
+		// Get the desired quotes
+		List<StockQuotationJPA> stocks = useOnlineFeed ? loadQuotesFromStokker(ticker):loadQuotesFromFile(ticker);
+
+		// Set up the analysis job
+		Set<Indicator> indicators = new HashSet<>();
+		indicators.add(IndicatorsFactory.max(Granularity.DAY, 200));
+		indicators.add(IndicatorsFactory.sma(Granularity.DAY, 200));
+		indicators.add(IndicatorsFactory.min(Granularity.DAY, 200));
+
+		List<AnalizedStockQuotation> quotations = analyzeService.analyzeStockQuotations(stocks, indicators);
+
+		// Build the chart data
+		ChartData toReturn = buildChartData(quotations);
+		return toReturn;
 	}
 
-
 	
+	/**
+	 * Utility method for loading stocks without stokker. Some sample flies are used instead
+	 * @param ticker
+	 * @return
+	 */
+	private List<StockQuotationJPA> loadQuotesFromFile(String ticker) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Utility method encapsulating the retrieval on the stocks quotations from stokker using a RestTemplate
+	 * TODO Should be better off in a separated bean
+	 * @param ticker
+	 * @return
+	 */
+	private List<StockQuotationJPA> loadQuotesFromStokker(String ticker) {
+		
+		// FIXME extract this to a configuration parameter
+		String url = String.format("http://localhost:8989/stockQuotationJPAs/search/findValueByStock?ticker=%s",ticker);
+
+		try {
+			ResponseEntity<StockQuotationJPAPagedResources> response = rt.getForEntity(url,
+					StockQuotationJPAPagedResources.class);
+
+			System.out.println(response.getStatusCode());
+
+			if (HttpStatus.OK != response.getStatusCode()) {
+				System.out.println("Error retrieving the stock quotations: " + response.getStatusCode());
+				return null;
+			}
+
+			List<StockQuotationJPA> stocks = new ArrayList<>(response.getBody().getContent());
+			
+			return stocks;
+		}
+
+		catch (RestClientException rex) {
+			System.out.println("Error retrieving the stock quotations: " + rex.getMessage());
+			return null;
+		}
+
+	}
+
+	/**
+	 * Utility function that translates the data from Spark into the custom
+	 * format used by the chart library
+	 * 
+	 * @param quotations
+	 * @return
+	 */
+	private ChartData buildChartData(List<AnalizedStockQuotation> quotations) {
+		new ChartData();
+
+		final ChartData toReturn = new ChartData();
+		toReturn.setLabels(new ArrayList<>());
+		toReturn.setSeries(Arrays.asList("Price", "SMA(200)", "MAX200", "MIN200"));
+
+		// FIXME How should manage the labels
+		for (int i = 0; i < quotations.size(); i++) {
+			toReturn.getLabels().add(String.valueOf(i));
+		}
+
+		List<Double> priceData = new ArrayList<>();
+		List<Double> smaData = new ArrayList<>();
+		List<Double> maxData = new ArrayList<>();
+		List<Double> minData = new ArrayList<>();
+
+		// FIXME data is coming in the wrong order, why?
+		Collections.reverse(quotations);
+
+		quotations.stream().forEach(s -> priceData.add(s.getValue()));
+		quotations.stream().forEach(s -> smaData.add(s.getIndicators().get("SMA").getValue()));
+		quotations.stream().forEach(s -> minData.add(s.getIndicators().get("MAX").getValue()));
+		quotations.stream().forEach(s -> maxData.add(s.getIndicators().get("MIN").getValue()));
+
+		toReturn.setDatasets(Arrays.asList(priceData, smaData, maxData, minData));
+
+		return toReturn;
+	}
+
 }

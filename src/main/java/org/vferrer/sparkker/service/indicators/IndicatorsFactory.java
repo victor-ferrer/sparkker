@@ -20,7 +20,20 @@ public class IndicatorsFactory
 		return toReturn;
 	}
 	
-	
+	/*
+	 * MIN
+	 */
+	public static Indicator min(Granularity granularity, Integer windowLength) 
+	{
+		Indicator toReturn = new MINIndicator();
+		toReturn.setName("MIN");
+		toReturn.setGranularity(granularity);
+		toReturn.setGranularity(granularity);
+		toReturn.setWindowLength(windowLength);
+		
+		return toReturn;
+	}
+		
 	/*
 	 * MAX
 	 */

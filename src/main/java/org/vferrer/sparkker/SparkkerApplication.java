@@ -3,8 +3,10 @@ package org.vferrer.sparkker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @SpringBootApplication
+@RequestMapping("/sparkker")
 @Import(SparkkerConfig.class)
 public class SparkkerApplication {
 
