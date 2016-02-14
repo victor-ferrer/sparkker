@@ -49,18 +49,18 @@ public class SparkkerController {
 	private boolean useOnlineFeed;
 
 	@RequestMapping("/analyzeStock")
-	public ChartData analyzeQuote(String ticker) throws IOException {
+	public ChartData analyzeQuote(String ticker, Integer windowSize) throws IOException {
 
 		// Get the desired quotes
 		List<StockQuotationJPA> stocks = useOnlineFeed ? loadQuotesFromStokker(ticker):loadQuotesFromFile(ticker);
 
 		// Set up the analysis job
 		Set<Indicator> indicators = new HashSet<>();
-		indicators.add(IndicatorsFactory.max(Granularity.DAY, 200));
-		indicators.add(IndicatorsFactory.sma(Granularity.DAY, 200));
-		indicators.add(IndicatorsFactory.min(Granularity.DAY, 200));
+		indicators.add(IndicatorsFactory.max(Granularity.DAY, windowSize));
+		indicators.add(IndicatorsFactory.sma(Granularity.DAY, windowSize));
+		indicators.add(IndicatorsFactory.min(Granularity.DAY, windowSize));
 
-		List<AnalizedStockQuotation> quotations = analyzeService.analyzeStockQuotations(stocks, indicators);
+		List<AnalizedStockQuotation> quotations = analyzeService.analyzeStockQuotations(stocks, indicators,windowSize);
 
 		// Build the chart data
 		ChartData toReturn = buildChartData(quotations);
@@ -166,8 +166,8 @@ public class SparkkerController {
 
 		quotations.stream().forEach(s -> priceData.add(s.getValue()));
 		quotations.stream().forEach(s -> smaData.add(s.getIndicators().get("SMA").getValue()));
-		quotations.stream().forEach(s -> minData.add(s.getIndicators().get("MAX").getValue()));
-		quotations.stream().forEach(s -> maxData.add(s.getIndicators().get("MIN").getValue()));
+		quotations.stream().forEach(s -> maxData.add(s.getIndicators().get("MAX").getValue()));
+		quotations.stream().forEach(s -> minData.add(s.getIndicators().get("MIN").getValue()));
 
 		toReturn.setDatasets(Arrays.asList(priceData, smaData, maxData, minData));
 

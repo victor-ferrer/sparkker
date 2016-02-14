@@ -31,7 +31,7 @@ public class AnalyzeService
 	 * @return
 	 * @throws IOException
 	 */
-	public List<AnalizedStockQuotation> analyzeStockQuotations(List<StockQuotationJPA> stocks, Set<Indicator> indicators) throws IOException
+	public List<AnalizedStockQuotation> analyzeStockQuotations(List<StockQuotationJPA> stocks, Set<Indicator> indicators, int windowSize) throws IOException
 	{
 		JavaRDD<StockQuotationJPA> quotationsRDD = sc.parallelize(stocks);
 		
@@ -45,10 +45,9 @@ public class AnalyzeService
 		RDDFunctions<StockQuotationJPA> rddFs = RDDFunctions.fromRDD(rdd, classTag);
 		
 		// Calculate all indicators in the current time window
-		JavaRDD<AnalizedStockQuotation> processedQuotationsRDD = rddFs.sliding(200).toJavaRDD().map(new IndicatorFunction(indicators));
+		JavaRDD<AnalizedStockQuotation> processedQuotationsRDD = rddFs.sliding(windowSize).toJavaRDD().map(new IndicatorFunction(indicators));
 		
 		return processedQuotationsRDD.collect();
 		
 	}
-	
 }

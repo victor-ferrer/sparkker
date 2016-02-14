@@ -23,6 +23,7 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 })
 .controller('indicatorsController', function($scope, $http) 
 {
+	$scope.windowsize = 200;
 	$scope.stocks = [{
 		  label: 'Red Eléctrica Corporación',
 		  ticker: 'REE.MC'},
@@ -50,7 +51,7 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 	}
 	
 	$scope.loadData = function (ticker) {
-		$http.get('/analyzeStock?ticker=' + ticker).success(function(newData) {
+		$http.get('/analyzeStock?ticker=' + ticker + "&windowSize=" + $scope.windowsize).success(function(newData) {
 			$scope.labels = newData.labels;
 			$scope.series = newData.series;
 			$scope.data = newData.datasets;
