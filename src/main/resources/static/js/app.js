@@ -24,14 +24,20 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 .controller('indicatorsController', function($scope, $http) 
 {
 	$scope.stocks = [{
-		  label: 'Mapfre Seguros',
-		  ticker: 'MAP.MC'},
+		  label: 'Red Eléctrica Corporación',
+		  ticker: 'REE.MC'},
 		  {
 		  label: 'Banco Santander',
 		  ticker: 'SAN.MC'},
 		  {
-		  label: 'Repsol',
-		  ticker: 'REP.MC'}];
+		  label: 'Mapfre',
+		  ticker: 'MAP.MC'},
+		  {
+		  label: 'Walmart',
+		  ticker: 'WMT'},
+		  {
+		  label: 'Visa',
+		  ticker: 'V'}];
 	
 	$scope.targetStock = $scope.stocks[1];
 	

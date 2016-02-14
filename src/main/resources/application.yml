@@ -5,7 +5,7 @@ server:
   port: 8988 
 data:
   feed:
-     online: true
+     online: false
 ---
 spring:
    profiles: default

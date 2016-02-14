@@ -1,6 +1,9 @@
 package org.vferrer.sparkker.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,6 +27,8 @@ import org.vferrer.sparkker.stokker.Indicator;
 import org.vferrer.sparkker.stokker.Indicator.Granularity;
 import org.vferrer.sparkker.stokker.StockQuotationJPA;
 import org.vferrer.sparkker.stokker.StockQuotationJPAPagedResources;
+
+import com.clearspring.analytics.util.Lists;
 
 @RestController
 public class SparkkerController {
@@ -67,9 +73,34 @@ public class SparkkerController {
 	 * @param ticker
 	 * @return
 	 */
-	private List<StockQuotationJPA> loadQuotesFromFile(String ticker) {
-		// TODO Auto-generated method stub
-		return null;
+	private List<StockQuotationJPA> loadQuotesFromFile(String ticker) 
+	{
+		
+		URL fileURL = SparkkerController.class.getResource("/data/" + ticker);
+		
+		if (fileURL != null){
+			
+			try {
+				List<String> lines = FileUtils.readLines(new File(fileURL.toURI()));
+				
+				List<StockQuotationJPA> toReturn = new ArrayList<>();
+				for (String line : lines) {
+					toReturn.add(StockQuotationJPA.fromLine(line));
+				}
+				
+				return toReturn;
+				
+			} catch (IOException | URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return Lists.newArrayList();
 	}
 
 	/**
