@@ -24,7 +24,14 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 .controller('indicatorsController', function($scope, $http) 
 {
 	$scope.windowsize = 200;
-	$scope.stocks = [{
+	$scope.stocks = [
+          {
+          label: 'Abertis Infrastructuras',
+          ticker: 'ABE.MC'},
+          {
+          label: 'Bolsas y Mercados',
+          ticker: 'BME.MC'},
+          {
 		  label: 'Red Eléctrica Corporación',
 		  ticker: 'REE.MC'},
 		  {
@@ -47,7 +54,14 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 		bezierCurve : false,
 		animation: false,
 		pointDot : false
-
+	}
+	
+	$scope.configVoting = {
+			datasetFill : false,
+			bezierCurve : false,
+			animation: false,
+			pointDot : false,
+		    showTooltips: false
 	}
 	
 	$scope.loadData = function (ticker) {
@@ -55,6 +69,9 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 			$scope.labels = newData.labels;
 			$scope.series = newData.series;
 			$scope.data = newData.datasets;
+			$scope.labelsVoting = newData.labelsVoting;
+			$scope.seriesVoting = newData.seriesVoting;
+			$scope.dataVoting = newData.datasetsVoting;
 			
 		});
 	}

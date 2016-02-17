@@ -1,0 +1,79 @@
+package org.vferrer.sparkker.kie.rules
+
+import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
+import org.vferrer.sparkker.service.facts.TradingSession;
+import org.vferrer.sparkker.service.facts.StockRuleData;
+
+global TradingSession session;
+
+/* If a stock price is over the yearly moving average (200 sessions)
+*  is probably following an upward trend
+*/
+rule "SMABuy" 
+dialect "java"	
+when
+	$stockData : AnalizedStockQuotation()
+    $price : Double() from  $stockData.value
+    $sma200d : Double() from  $stockData.getIndicator("SMA").value
+    eval($price > $sma200d);
+then
+	$stockData.getIndicator("SCORE").increaseValue(1d);
+end
+
+/* If a stock price creating new yearly highs probably it will
+*  have momentum to create more
+*/
+rule "MAX" 
+dialect "java"	
+when
+	$stockData : AnalizedStockQuotation()
+    $price : Double() from  $stockData.value
+    $max : Double() from  $stockData.getIndicator("MAX").value
+    eval($price >= $max);
+then
+	$stockData.getIndicator("SCORE").increaseValue(1d);
+end
+
+/* If a stock price is under the yearly moving average (200 sessions)
+*  is probably following a downward trend
+*/
+rule "SMASell" 
+dialect "java"	
+when
+
+	$stockData : AnalizedStockQuotation()
+    $price : Double() from  $stockData.value
+    $sma200d : Double() from  $stockData.getIndicator("SMA").value
+    eval($price < $sma200d);
+then
+    	$stockData.getIndicator("SCORE").increaseValue(-1d);
+end
+
+/* If a stock price creating new yearly minimums probably it will
+*  have momentum to create more
+*/
+rule "MIN" 
+dialect "java"	
+when
+	$stockData : AnalizedStockQuotation()
+    $price : Double() from  $stockData.value
+    $min : Double() from  $stockData.getIndicator("MIN").value
+    eval($price <= $min);
+then
+	$stockData.getIndicator("SCORE").increaseValue(-1d);
+end
+
+
+// USE this if we want to deal with more than one measurement
+//$stockRuleData : StockRuleData()
+//$stockData : AnalizedStockQuotation() from $stockRuleData.getAt(session.getCurrentIndex())
+
+/*
+rule "IterateRule"
+dialect "java"
+when
+	eval(session.getCurrentIndex() >= 0)
+then
+	session.setCurrentIndex(session.getCurrentIndex() - 1);
+end
+*/

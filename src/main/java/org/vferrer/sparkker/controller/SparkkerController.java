@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.vferrer.sparkker.service.AnalyzeService;
+import org.vferrer.sparkker.service.RulesEngine;
 import org.vferrer.sparkker.service.indicators.IndicatorsFactory;
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
 import org.vferrer.sparkker.stokker.Indicator;
@@ -38,6 +39,9 @@ public class SparkkerController {
 
 	@Autowired
 	RestTemplate rt;
+	
+	@Autowired
+	RulesEngine droolsService;
 
 	@Value("${eureka.client.serviceUrl.defaultZone}")
 	String baseEurekaPath;
@@ -49,7 +53,7 @@ public class SparkkerController {
 	private boolean useOnlineFeed;
 
 	@RequestMapping("/analyzeStock")
-	public ChartData analyzeQuote(String ticker, Integer windowSize) throws IOException {
+	public ChartData analyzeQuote(String ticker, Integer windowSize) throws Exception {
 
 		// Get the desired quotes
 		List<StockQuotationJPA> stocks = useOnlineFeed ? loadQuotesFromStokker(ticker):loadQuotesFromFile(ticker);
@@ -62,8 +66,15 @@ public class SparkkerController {
 
 		List<AnalizedStockQuotation> quotations = analyzeService.analyzeStockQuotations(stocks, indicators,windowSize);
 
+		// FIXME data is coming in the wrong order, why?
+		Collections.reverse(quotations);
+		
+		// Run the business rules over the data + indicators
+		droolsService.executeRules(quotations);
+		
 		// Build the chart data
 		ChartData toReturn = buildChartData(quotations);
+		
 		return toReturn;
 	}
 
@@ -75,7 +86,6 @@ public class SparkkerController {
 	 */
 	private List<StockQuotationJPA> loadQuotesFromFile(String ticker) 
 	{
-		
 		URL fileURL = SparkkerController.class.getResource("/data/" + ticker);
 		
 		if (fileURL != null){
@@ -142,27 +152,29 @@ public class SparkkerController {
 	 * format used by the chart library
 	 * 
 	 * @param quotations
+	 * @param scorings 
 	 * @return
 	 */
 	private ChartData buildChartData(List<AnalizedStockQuotation> quotations) {
 		new ChartData();
-
+		
 		final ChartData toReturn = new ChartData();
 		toReturn.setLabels(new ArrayList<>());
+		toReturn.setLabelsVoting(new ArrayList<>());
+		
 		toReturn.setSeries(Arrays.asList("Price", "SMA(200)", "MAX200", "MIN200"));
-
+		toReturn.setSeriesVoting(Arrays.asList("SCORE"));
+		
 		// FIXME How should manage the labels
 		for (int i = 0; i < quotations.size(); i++) {
 			toReturn.getLabels().add(String.valueOf(i));
+			toReturn.getLabelsVoting().add(String.valueOf(i));
 		}
 
 		List<Double> priceData = new ArrayList<>();
 		List<Double> smaData = new ArrayList<>();
 		List<Double> maxData = new ArrayList<>();
 		List<Double> minData = new ArrayList<>();
-
-		// FIXME data is coming in the wrong order, why?
-		Collections.reverse(quotations);
 
 		quotations.stream().forEach(s -> priceData.add(s.getValue()));
 		quotations.stream().forEach(s -> smaData.add(s.getIndicators().get("SMA").getValue()));
@@ -171,6 +183,12 @@ public class SparkkerController {
 
 		toReturn.setDatasets(Arrays.asList(priceData, smaData, maxData, minData));
 
+		// Voting char
+		List<Double> values = new ArrayList<>();
+		quotations.stream().forEach(s -> values.add(s.getIndicators().get("SCORE").getValue()));
+		toReturn.setDatasetsVoting(Arrays.asList(values));
+		
+		
 		return toReturn;
 	}
 

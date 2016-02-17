@@ -59,6 +59,15 @@ public abstract class Indicator implements Serializable
 	public Double getValue() {
 		return value;
 	}
+	
+	public void increaseValue(Double delta){
+		if (value != null){
+			value = value + delta;
+		}
+		else {
+			value = delta;
+		}
+	}
 
 	public void setValue(Double value) {
 		this.value = value;

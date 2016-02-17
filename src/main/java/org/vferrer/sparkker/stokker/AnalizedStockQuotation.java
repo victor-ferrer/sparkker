@@ -27,4 +27,12 @@ public class AnalizedStockQuotation extends StockQuotationJPA {
 	public Map<String, Indicator> getIndicators() {
 		return indicators;
 	}
+	
+	public Indicator getIndicator(String indicatorName)
+	{
+		return indicators.get(indicatorName);
+	}
+	
+	
+	
 }

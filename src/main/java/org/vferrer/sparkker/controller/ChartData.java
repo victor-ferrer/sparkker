@@ -3,7 +3,11 @@ package org.vferrer.sparkker.controller;
 import java.io.Serializable;
 import java.util.List;
 
-
+/**
+ * Convenience POJO class for sending data to the UI
+ * @author efevict
+ *
+ */
 public class ChartData implements Serializable {
 
 	/**
@@ -16,6 +20,15 @@ public class ChartData implements Serializable {
 	private List<List<Double>> datasets;
 	
 	private List<String> series;
+	
+	private List<String> labelsVoting;
+	
+	private List<List<Double>> datasetsVoting;
+	
+	private List<String> seriesVoting;
+	
+	
+	
 	
 	public ChartData()
 	{
@@ -43,6 +56,30 @@ public class ChartData implements Serializable {
 
 	public void setSeries(List<String> series) {
 		this.series = series;
+	}
+
+	public List<String> getSeriesVoting() {
+		return seriesVoting;
+	}
+
+	public void setSeriesVoting(List<String> seriesVoting) {
+		this.seriesVoting = seriesVoting;
+	}
+
+	public List<List<Double>> getDatasetsVoting() {
+		return datasetsVoting;
+	}
+
+	public void setDatasetsVoting(List<List<Double>> datasetsVoting) {
+		this.datasetsVoting = datasetsVoting;
+	}
+
+	public List<String> getLabelsVoting() {
+		return labelsVoting;
+	}
+
+	public void setLabelsVoting(List<String> labelsVoting) {
+		this.labelsVoting = labelsVoting;
 	}
 	
 }

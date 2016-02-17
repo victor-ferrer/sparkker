@@ -1,9 +1,15 @@
 <br>
-<p>Select Stock: <select ng-options="stock as stock.label for stock in stocks" ng-model="targetStock" ng-change="updateChart()"></select>
-<br>
-<p>Select Window Size: <input type="number" ng-change="updateChart()" ng-model="windowsize" ng-model-options="{debounce: 1000}" min="1" max="200"></input>
+<p>Select Stock: <select ng-options="stock as stock.label for stock in stocks" ng-model="targetStock" ng-change="updateChart()"></select> Select Window Size: <input type="number" ng-change="updateChart()" ng-model="windowsize" ng-model-options="{debounce: 1000}" min="1" max="200"></input>
 
 <canvas id="line" class="chart chart-line" chart-data="data"
   chart-labels="labels" chart-legend="true" chart-series="series"
-  chart-click="onClick" chart-options="config">
+  chart-click="onClick" chart-options="config" height="150">
 </canvas> 
+
+<div>
+	<canvas id="line" class="chart chart-line" chart-data="dataVoting"
+	  chart-labels="labelsVoting" chart-legend="false" chart-series="seriesVoting"
+	  chart-click="onClick" chart-options="configVoting" height="40">
+	</canvas> 
+
+</div>
