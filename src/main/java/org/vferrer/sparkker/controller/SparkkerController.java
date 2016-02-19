@@ -2,6 +2,7 @@ package org.vferrer.sparkker.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -86,12 +88,12 @@ public class SparkkerController {
 	 */
 	private List<StockQuotationJPA> loadQuotesFromFile(String ticker) 
 	{
-		URL fileURL = SparkkerController.class.getResource("/data/" + ticker);
+		InputStream fileIS = SparkkerController.class.getResourceAsStream("/data/" + ticker);
 		
-		if (fileURL != null){
+		if (fileIS != null){
 			
 			try {
-				List<String> lines = FileUtils.readLines(new File(fileURL.toURI()));
+				List<String> lines = IOUtils.readLines(fileIS);
 				
 				List<StockQuotationJPA> toReturn = new ArrayList<>();
 				for (String line : lines) {
@@ -108,6 +110,9 @@ public class SparkkerController {
 				e.printStackTrace();
 			}
 			
+		}
+		else {
+			System.out.println("WARN: Could not find the sample data file for ticker " + ticker);
 		}
 		
 		return Lists.newArrayList();
@@ -156,7 +161,6 @@ public class SparkkerController {
 	 * @return
 	 */
 	private ChartData buildChartData(List<AnalizedStockQuotation> quotations) {
-		new ChartData();
 		
 		final ChartData toReturn = new ChartData();
 		toReturn.setLabels(new ArrayList<>());

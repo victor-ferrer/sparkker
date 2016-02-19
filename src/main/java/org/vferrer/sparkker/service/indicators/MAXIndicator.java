@@ -27,7 +27,7 @@ public class MAXIndicator extends Indicator {
 				
 	    Double maxValue = result.get().getValue();
 		this.setValue(maxValue);
-		
+
 		return this;
 	}
 

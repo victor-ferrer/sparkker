@@ -29,17 +29,17 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
           label: 'Abertis Infrastructuras',
           ticker: 'ABE.MC'},
           {
-          label: 'Bolsas y Mercados',
-          ticker: 'BME.MC'},
-          {
-		  label: 'Red Eléctrica Corporación',
-		  ticker: 'REE.MC'},
-		  {
 		  label: 'Banco Santander',
 		  ticker: 'SAN.MC'},
 		  {
+          label: 'Bolsas y Mercados',
+          ticker: 'BME.MC'},
+          {
 		  label: 'Mapfre',
 		  ticker: 'MAP.MC'},
+		  {
+		  label: 'Red Eléctrica Corporación',
+		  ticker: 'REE.MC'},
 		  {
 		  label: 'Walmart',
 		  ticker: 'WMT'},

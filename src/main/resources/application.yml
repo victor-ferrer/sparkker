@@ -6,6 +6,9 @@ server:
 data:
   feed:
      online: false
+rules:
+   file:
+      path: C:/development/sparkker/src/main/resources/org/vferrer/sparkker/service/rules.dlr
 ---
 spring:
    profiles: default
@@ -14,4 +17,5 @@ eureka:
     client:
         serviceUrl:
             defaultZone: http://user:${eureka.password}@localhost:9999/eureka/
+            
          

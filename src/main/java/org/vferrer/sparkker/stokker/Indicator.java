@@ -15,7 +15,19 @@ public abstract class Indicator implements Serializable
 	private static final long serialVersionUID = 7383425174742805085L;
 
 	public enum Granularity {
-		DAY, WEEK, MONTH
+		
+		DAY("D"), WEEK("W"), MONTH("M");
+		
+		private Granularity(String label){
+			this.label = label;
+		}
+
+		private String label;
+		
+		public String getLabel(){
+			return label;
+		}
+		
 	}
 	
 	private String name;
@@ -85,6 +97,23 @@ public abstract class Indicator implements Serializable
 	public Indicator clone(){
 		return (Indicator) SerializationUtils.clone(this);
 	}
-
+	
+	@Override
+	public int hashCode(){
+		return java.util.Objects.hash(name,granularity.getLabel(),windowLength);
+	}
+	
+	@Override
+	public boolean equals(Object otherIndicator){
+		
+		if (!(otherIndicator instanceof Indicator)){
+			return false;
+		}
+		
+		Indicator other = (Indicator) otherIndicator;
+	
+		return name.equals(other.getName()) && (granularity == other.granularity) && (windowLength.compareTo(other.getWindowLength()) == 0); 
+	}
+	
 	public abstract Indicator calculate(List<StockQuotationJPA> stockList);		
 }

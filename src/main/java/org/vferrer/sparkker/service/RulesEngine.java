@@ -1,8 +1,6 @@
 package org.vferrer.sparkker.service;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
