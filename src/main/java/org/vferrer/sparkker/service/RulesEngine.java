@@ -6,6 +6,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.vferrer.sparkker.service.facts.Operation;
 import org.vferrer.sparkker.service.facts.TradingSession;
 import org.vferrer.sparkker.service.indicators.ScoreIndicator;
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
@@ -21,20 +22,28 @@ public class RulesEngine {
 	@Autowired
 	private KieContainer kieContainer;
 
-	public void executeRules(List<AnalizedStockQuotation> quotations) throws Exception {
+	public List<Operation> executeRules(List<AnalizedStockQuotation> quotations) throws Exception {
 
 		// Init session and global variables
 		KieSession kSession = kieContainer.newKieSession();
 
 		TradingSession session = new TradingSession();
-		kSession.setGlobal("session", session);
+//		kSession.setGlobal("session", session);
+		kSession.insert(session);
 
 		// FIXME Add an empty indicator
 		quotations.forEach(quot -> quot.getIndicators().put("SCORE", new ScoreIndicator()));
 		
 		// Submit all and fire
-		quotations.forEach(quot -> kSession.insert(quot));
-		kSession.fireAllRules();
+		for (AnalizedStockQuotation quot : quotations){
+			kSession.insert(quot);
+			kSession.fireAllRules();
+			// Recover results
+		}
+		List<Operation> toReturn = session.getOperationList();
+		
 		kSession.dispose();
+		
+		return toReturn;
 	}
 }

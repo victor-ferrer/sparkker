@@ -72,6 +72,7 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 			$scope.labelsVoting = newData.labelsVoting;
 			$scope.seriesVoting = newData.seriesVoting;
 			$scope.dataVoting = newData.datasetsVoting;
+			$scope.operations = newData.operations;
 			
 		});
 	}

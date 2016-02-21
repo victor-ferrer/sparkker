@@ -1,28 +1,39 @@
 package org.vferrer.sparkker.service.facts;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class TradingSession 
 {
-	private List<String> messageList;
+	private boolean isOnMarket;
 
+	private List<Operation> operationList;
+	
 	public TradingSession(){
-		messageList = new ArrayList<>();
+		isOnMarket = false;
+		operationList = new LinkedList<>();
 	}
 	
-	public void addMessage(String message){
-		messageList.add(message);
+	public void addOperation(String type, Date date, Double price, Double score)
+	{
+		operationList.add(new Operation(type, date, price, score));
 	}
 
-	public List<String> getMessageList() {
-		return messageList;
+	public boolean isOnMarket() {
+		
+		if (operationList.isEmpty()){
+			return false;
+		}
+		
+		return operationList.get(operationList.size() -1).getType().equals("BUY");
 	}
 
-	public void setMessageList(List<String> messageList) {
-		this.messageList = messageList;
+	public List<Operation> getOperationList() {
+		return operationList;
+	}
+
+	public void setOperationList(List<Operation> operationList) {
+		this.operationList = operationList;
 	}
 }

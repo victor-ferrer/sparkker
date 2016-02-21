@@ -1,10 +1,8 @@
 package org.vferrer.sparkker.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +21,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.vferrer.sparkker.service.AnalyzeService;
 import org.vferrer.sparkker.service.RulesEngine;
+import org.vferrer.sparkker.service.facts.Operation;
 import org.vferrer.sparkker.service.indicators.IndicatorsFactory;
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
 import org.vferrer.sparkker.stokker.Indicator;
@@ -72,10 +70,10 @@ public class SparkkerController {
 		Collections.reverse(quotations);
 		
 		// Run the business rules over the data + indicators
-		droolsService.executeRules(quotations);
+		List<Operation> operations = droolsService.executeRules(quotations);
 		
 		// Build the chart data
-		ChartData toReturn = buildChartData(quotations);
+		ChartData toReturn = buildChartData(quotations, operations);
 		
 		return toReturn;
 	}
@@ -157,14 +155,17 @@ public class SparkkerController {
 	 * format used by the chart library
 	 * 
 	 * @param quotations
+	 * @param operations 
 	 * @param scorings 
 	 * @return
 	 */
-	private ChartData buildChartData(List<AnalizedStockQuotation> quotations) {
+	private ChartData buildChartData(List<AnalizedStockQuotation> quotations, List<Operation> operations) {
 		
 		final ChartData toReturn = new ChartData();
 		toReturn.setLabels(new ArrayList<>());
 		toReturn.setLabelsVoting(new ArrayList<>());
+		
+		toReturn.setOperations(operations);
 		
 		toReturn.setSeries(Arrays.asList("Price", "SMA(200)", "MAX200", "MIN200"));
 		toReturn.setSeriesVoting(Arrays.asList("SCORE"));

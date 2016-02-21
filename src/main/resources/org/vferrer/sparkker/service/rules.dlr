@@ -4,7 +4,7 @@ import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
 import org.vferrer.sparkker.service.facts.TradingSession;
 import org.vferrer.sparkker.service.facts.StockRuleData;
 
-global TradingSession session;
+//global TradingSession session;
 
 /* If a stock price is over the yearly moving average (200 sessions)
 *  is probably following an upward trend
@@ -28,8 +28,8 @@ dialect "java"
 when
 	$stockData : AnalizedStockQuotation()
     $price : Double() from  $stockData.value
-    $max : Double() from  $stockData.getIndicator("MAX").value
-    eval($price >= $max);
+    $max : Double() from  $stockData.getIndicator("MAX").value	
+    eval($price >= $max * 0.97d);
 then
 	$stockData.getIndicator("SCORE").increaseValue(1d);
 end
@@ -46,7 +46,7 @@ when
     $sma200d : Double() from  $stockData.getIndicator("SMA").value
     eval($price < $sma200d);
 then
-    	$stockData.getIndicator("SCORE").increaseValue(-1d);
+	$stockData.getIndicator("SCORE").increaseValue(-1d);
 end
 
 /* If a stock price creating new yearly minimums probably it will
@@ -58,22 +58,56 @@ when
 	$stockData : AnalizedStockQuotation()
     $price : Double() from  $stockData.value
     $min : Double() from  $stockData.getIndicator("MIN").value
-    eval($price <= $min);
+    eval($price <= ($min * 1.03d))
 then
 	$stockData.getIndicator("SCORE").increaseValue(-1d);
 end
 
+rule "BUY_RULE"
+dialect "java"
+salience -49
+when
+	$stockData : AnalizedStockQuotation()
 
-// USE this if we want to deal with more than one measurement
-//$stockRuleData : StockRuleData()
-//$stockData : AnalizedStockQuotation() from $stockRuleData.getAt(session.getCurrentIndex())
+	$session : TradingSession(isOnMarket() == false)
+		
+	// Get "todays" score
+	$todayScore : Double () from $stockData.getIndicator("SCORE").value
+	
+	// TODO: Get "yesterdays" stock 
+	
+	eval($todayScore > 0)
+then
+    modify( $session ) { addOperation("BUY",$stockData.getTimestamp(),$stockData.getValue(),$todayScore) };
+end
 
-/*
-rule "IterateRule"
+
+rule "SELL_RULE_STOP"
+salience -50
 dialect "java"
 when
-	eval(session.getCurrentIndex() >= 0)
+	$stockData : AnalizedStockQuotation()
+	
+	$session : TradingSession($session.isOnMarket() == true)
+	
+	// Get "todays" score
+	$todayScore : Double () from $stockData.getIndicator("SCORE").value
+	
+	// TODO: Get "yesterdays" stock 
+	
+	eval($todayScore < 0d)
 then
-	session.setCurrentIndex(session.getCurrentIndex() - 1);
+	modify( $session ) { addOperation("SELL",$stockData.getTimestamp(),$stockData.getValue(),$todayScore) };
 end
-*/
+
+rule "CLEAN_RULE"
+salience -100
+dialect "java"
+when
+	$stockData : AnalizedStockQuotation()
+	
+	eval(true)
+then
+	retract($stockData);
+end
+
