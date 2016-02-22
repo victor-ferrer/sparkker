@@ -41,6 +41,9 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 		  label: 'Red Eléctrica Corporación',
 		  ticker: 'REE.MC'},
 		  {
+		  label: 'Repsol',
+		  ticker: 'REP.MC'},		  
+		  {
 		  label: 'Walmart',
 		  ticker: 'WMT'},
 		  {

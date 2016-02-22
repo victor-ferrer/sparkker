@@ -1,8 +1,6 @@
 package org.vferrer.sparkker.config;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URL;
 
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;

@@ -67,16 +67,14 @@ rule "BUY_RULE"
 dialect "java"
 salience -49
 when
-	$stockData : AnalizedStockQuotation()
-
-	$session : TradingSession(isOnMarket() == false)
+	$stockData  : AnalizedStockQuotation()
+	$session    : TradingSession(isOnMarket() == false)
 		
-	// Get "todays" score
 	$todayScore : Double () from $stockData.getIndicator("SCORE").value
+	$sma200d    : Double() from  $stockData.getIndicator("SMA").value	
 	
-	// TODO: Get "yesterdays" stock 
-	
-	eval($todayScore > 0)
+	// Buy if score is positive and distance to SMA < 5%
+	eval($todayScore > 0 && (($stockData.getValue() / $sma200d) < 1.05d))
 then
     modify( $session ) { addOperation("BUY",$stockData.getTimestamp(),$stockData.getValue(),$todayScore) };
 end
@@ -87,15 +85,13 @@ salience -50
 dialect "java"
 when
 	$stockData : AnalizedStockQuotation()
-	
 	$session : TradingSession($session.isOnMarket() == true)
 	
-	// Get "todays" score
 	$todayScore : Double () from $stockData.getIndicator("SCORE").value
+	$opening    : Double() from  $session.getOpeningPrice()
 	
-	// TODO: Get "yesterdays" stock 
-	
-	eval($todayScore < 0d)
+	// Sell if score is negative or distance to opening > 15%	
+	eval($todayScore < 0d  || (($stockData.getValue() / $opening) > 1.15d))
 then
 	modify( $session ) { addOperation("SELL",$stockData.getTimestamp(),$stockData.getValue(),$todayScore) };
 end

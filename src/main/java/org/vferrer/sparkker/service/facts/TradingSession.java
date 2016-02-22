@@ -6,12 +6,9 @@ import java.util.List;
 
 public class TradingSession 
 {
-	private boolean isOnMarket;
-
 	private List<Operation> operationList;
 	
 	public TradingSession(){
-		isOnMarket = false;
 		operationList = new LinkedList<>();
 	}
 	
@@ -28,6 +25,18 @@ public class TradingSession
 		
 		return operationList.get(operationList.size() -1).getType().equals("BUY");
 	}
+	
+	public Double getOpeningPrice()
+	{
+		if (operationList.isEmpty()){
+			// FIXME what should we do here
+			return 0d;
+		}
+		
+		return operationList.get(operationList.size() -1).getPrice();
+	}
+	
+	
 
 	public List<Operation> getOperationList() {
 		return operationList;

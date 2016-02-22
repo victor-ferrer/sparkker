@@ -27,19 +27,18 @@ public class RulesEngine {
 		// Init session and global variables
 		KieSession kSession = kieContainer.newKieSession();
 
+		// Placeholder for operations and statistics
 		TradingSession session = new TradingSession();
-//		kSession.setGlobal("session", session);
 		kSession.insert(session);
 
-		// FIXME Add an empty indicator
 		quotations.forEach(quot -> quot.getIndicators().put("SCORE", new ScoreIndicator()));
 		
-		// Submit all and fire
+		// Submit each quotation and fire
 		for (AnalizedStockQuotation quot : quotations){
 			kSession.insert(quot);
 			kSession.fireAllRules();
-			// Recover results
 		}
+		// Recover results
 		List<Operation> toReturn = session.getOperationList();
 		
 		kSession.dispose();
