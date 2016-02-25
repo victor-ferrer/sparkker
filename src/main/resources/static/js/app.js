@@ -7,19 +7,70 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 	}).when('/indicators', {
 		templateUrl : 'indicators.html',
 		controller : 'indicatorsController'
+	}).when('/jobs', {
+		templateUrl : 'jobs.html',
+		controller : 'jobsController'
 	})
 	.otherwise('/');
 
   $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 
 })
-.controller('navigation',
-
-  function($rootScope, $scope, $http, $location, $window) {
+.controller('navigation', function($rootScope, $scope, $http, $location, $window) {
 
 	$scope.tab = function(route) {
 		return $route.current && route === $route.current.controller;
 	};
+})
+.controller('jobsController', function($scope, $http) 
+{
+    $scope.myForm = {};
+    $scope.myForm.stop_loss_perc  = "3";
+    $scope.myForm.take_profit_perc  = "15";
+	$scope.stocks = [
+	                 {
+	                    label: 'Abertis Infrastructuras',
+	                    ticker: 'ABE.MC'},
+	                 {
+	                  	 label: 'Banco Santander',
+	           		  ticker: 'SAN.MC'},
+	          		  {
+	                    label: 'Bolsas y Mercados',
+	                    ticker: 'BME.MC'},
+	                 {
+	                    label: 'Mapfre',
+	                    ticker: 'MAP.MC'},
+	          		  {
+	                    label: 'Red Eléctrica Corporación',
+	       	         ticker: 'REE.MC'},
+	          		  {
+	          		     label: 'Repsol',
+	          		     ticker: 'REP.MC'},		  
+	          		  {
+	          		     label: 'Walmart',
+	          		     ticker: 'WMT'},
+	          		  {
+	          		     label: 'Visa',
+	          		     ticker: 'V'}
+	          		  ];
+	           
+
+  $scope.myForm.submitTheForm = function(item, event) {
+    var jobConfig = {
+       stopLossPerc : $scope.myForm.stop_loss_perc,
+       takeProfitPerc  : $scope.myForm.take_profit_perc,
+       targetStock : $scope.myForm.targetStock.ticker
+    };
+    console.log("--> Submitting form"+ JSON.stringify(jobConfig));
+
+    var responsePromise = $http.post("/jobs/submit", jobConfig, {});
+    responsePromise.success(function(dataFromServer, status, headers, config) {
+       $scope.operations = dataFromServer.operations;
+    });
+     responsePromise.error(function(data, status, headers, config) {
+       alert("Submitting form failed!");
+    });
+  }
 })
 .controller('indicatorsController', function($scope, $http) 
 {
@@ -89,7 +140,7 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 	$scope.onClick = function (points, evt) {
 	  console.log(points, evt);
 	};
-})
+});
 
 
 

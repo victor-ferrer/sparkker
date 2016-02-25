@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -78,6 +81,33 @@ public class SparkkerController {
 		return toReturn;
 	}
 
+	
+	@RequestMapping(path="/jobs/submit", method = RequestMethod.POST)
+	public ChartData analyzeQuote(@RequestBody JobParams jobConfig) throws Exception {
+
+		// Get the desired quotes
+		List<StockQuotationJPA> stocks = useOnlineFeed ? loadQuotesFromStokker(jobConfig.getTargetStock()):loadQuotesFromFile(jobConfig.getTargetStock());
+
+		// Set up the analysis job
+		int windowSize = 200;
+		Set<Indicator> indicators = new HashSet<>();
+		indicators.add(IndicatorsFactory.max(Granularity.DAY, windowSize));
+		indicators.add(IndicatorsFactory.sma(Granularity.DAY, windowSize));
+		indicators.add(IndicatorsFactory.min(Granularity.DAY, windowSize));
+
+		List<AnalizedStockQuotation> quotations = analyzeService.analyzeStockQuotations(stocks, indicators,windowSize);
+
+		// FIXME data is coming in the wrong order, why?
+		Collections.reverse(quotations);
+		
+		// Run the business rules over the data + indicators
+		List<Operation> operations = droolsService.executeRules(quotations);
+		
+		// Build the chart data
+		final ChartData toReturn = new ChartData();
+		toReturn.setOperations(operations);		
+		return toReturn;
+	}
 	
 	/**
 	 * Utility method for loading stocks without stokker. Some sample flies are used instead

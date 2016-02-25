@@ -1,0 +1,33 @@
+<div>
+ <form>
+	 <div class="form-group">
+	 	<label for="stockselect">SelectStock:</label>
+		<select id="stockselect" ng-options="stock as stock.label for stock in stocks" ng-model="myForm.targetStock"></select>
+	 </div>
+	 <div class="form-group">
+	 	<label for="top_loss_perc">Stop loss percentage (below SMA):</label>
+	  	<input type="number" class="form-control" id="top_loss_perc" ng-model="myForm.stop_loss_perc" min="0" max="100">  
+	 </div>
+	 <div class="form-group">
+ 	 	<label for="take_profit_perc">Take profit percentage:</label>
+		<input type="number"   class="form-control" id="take_profit_perc" ng-model="myForm.take_profit_perc" min="0" max="100"> 
+	 </div>
+	 <button  class="btn btn-default" ng-click="myForm.submitTheForm()">Run job</button>
+ </form>
+</div>
+
+<br />
+<div>
+	<table class="table" border="1" width="250" align="center">
+	  <tr>
+	  	<th>Operation Type</th>
+	  	<th>Price</th>
+	  	<th>Date</th>
+	  </tr>
+	  <tr ng-repeat="op in operations">
+	    <td>{{ op.type }}</td>
+	    <td>{{ op.price | number:2 }}</td>
+	    <td>{{ op.date | date }}</td>
+	  </tr>
+	</table>
+</div>
