@@ -6,7 +6,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.vferrer.sparkker.service.facts.Operation;
+import org.vferrer.sparkker.service.facts.Position;
 import org.vferrer.sparkker.service.facts.TradingSession;
 import org.vferrer.sparkker.service.indicators.ScoreIndicator;
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
@@ -22,7 +22,7 @@ public class RulesEngine {
 	@Autowired
 	private KieContainer kieContainer;
 
-	public List<Operation> executeRules(List<AnalizedStockQuotation> quotations) throws Exception {
+	public List<Position> executeRules(List<AnalizedStockQuotation> quotations) throws Exception {
 
 		// Init session and global variables
 		KieSession kSession = kieContainer.newKieSession();
@@ -39,7 +39,7 @@ public class RulesEngine {
 			kSession.fireAllRules();
 		}
 		// Recover results
-		List<Operation> toReturn = session.getOperationList();
+		List<Position> toReturn = session.getPositionList();
 		
 		kSession.dispose();
 		

@@ -1,4 +1,4 @@
-angular.module('sparkker', [ 'ngRoute','chart.js' ])
+angular.module('sparkker', [ 'ngRoute','chart.js','ngMaterial' ])
 .config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/', {
@@ -65,7 +65,7 @@ angular.module('sparkker', [ 'ngRoute','chart.js' ])
 
     var responsePromise = $http.post("/jobs/submit", jobConfig, {});
     responsePromise.success(function(dataFromServer, status, headers, config) {
-       $scope.operations = dataFromServer.operations;
+       $scope.positions = dataFromServer.positions;
     });
      responsePromise.error(function(data, status, headers, config) {
        alert("Submitting form failed!");

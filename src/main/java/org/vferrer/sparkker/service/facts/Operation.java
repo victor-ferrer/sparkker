@@ -8,7 +8,9 @@ public class Operation {
 	private Date date;
 	private Double price;
 	private Double score;
-
+	private Double smaInclination;
+	
+	
 	public Operation(String type, Date date, Double price, Double score) {
 		this.type = type;
 		this.date = date;
@@ -46,6 +48,14 @@ public class Operation {
 
 	public void setScore(Double score) {
 		this.score = score;
+	}
+
+	public Double getSmaInclination() {
+		return smaInclination;
+	}
+
+	public void setSmaInclination(Double smaInclination) {
+		this.smaInclination = smaInclination;
 	}
 
 }

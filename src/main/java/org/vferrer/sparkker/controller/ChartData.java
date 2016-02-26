@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.vferrer.sparkker.service.facts.Operation;
+import org.vferrer.sparkker.service.facts.Position;
 
 /**
  * Convenience POJO class for sending data to the UI
@@ -29,8 +30,7 @@ public class ChartData implements Serializable {
 	
 	private List<String> seriesVoting;
 	
-	private List<Operation> operations;
-	
+	private List<Position> positions;
 	
 	public ChartData()
 	{
@@ -84,12 +84,11 @@ public class ChartData implements Serializable {
 		this.labelsVoting = labelsVoting;
 	}
 
-	public List<Operation> getOperations() {
-		return operations;
+	public List<Position> getPositions() {
+		return positions;
 	}
 
-	public void setOperations(List<Operation> operations) {
-		this.operations = operations;
+	public void setPositions(List<Position> positions) {
+		this.positions = positions;
 	}
-	
 }

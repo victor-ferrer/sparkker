@@ -3,6 +3,7 @@ package org.vferrer.sparkker.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,13 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.vferrer.sparkker.service.AnalyzeService;
 import org.vferrer.sparkker.service.RulesEngine;
 import org.vferrer.sparkker.service.facts.Operation;
+import org.vferrer.sparkker.service.facts.Position;
 import org.vferrer.sparkker.service.indicators.IndicatorsFactory;
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
 import org.vferrer.sparkker.stokker.Indicator;
@@ -73,10 +74,24 @@ public class SparkkerController {
 		Collections.reverse(quotations);
 		
 		// Run the business rules over the data + indicators
-		List<Operation> operations = droolsService.executeRules(quotations);
+		List<Position> operations = droolsService.executeRules(quotations);
 		
+		for (Position position : operations) {
+			System.out.println(String.format("BUY: Price: %s Date: %s Score: %s ",
+																	position.getOpeningOperation().getPrice().toString(),
+																	position.getOpeningOperation().getDate().toString(),
+																	position.getOpeningOperation().getScore().toString()));
+			
+			
+			System.out.println(String.format("SELL: Price: %s Date: %s Score: %s ",
+																	position.getClosingOperation().getPrice().toString(),
+																	position.getClosingOperation().getDate().toString(),
+																	position.getClosingOperation().getScore().toString()));
+			
+			System.out.println("Yield: " + NumberFormat.getPercentInstance().format(position.getYield()/100d));
+		}
 		// Build the chart data
-		ChartData toReturn = buildChartData(quotations, operations);
+		ChartData toReturn = buildChartData(quotations, null);
 		
 		return toReturn;
 	}
@@ -101,11 +116,12 @@ public class SparkkerController {
 		Collections.reverse(quotations);
 		
 		// Run the business rules over the data + indicators
-		List<Operation> operations = droolsService.executeRules(quotations);
+		// Run the business rules over the data + indicators
+		List<Position> positions = droolsService.executeRules(quotations);
 		
 		// Build the chart data
 		final ChartData toReturn = new ChartData();
-		toReturn.setOperations(operations);		
+		toReturn.setPositions(positions);		
 		return toReturn;
 	}
 	
@@ -195,7 +211,7 @@ public class SparkkerController {
 		toReturn.setLabels(new ArrayList<>());
 		toReturn.setLabelsVoting(new ArrayList<>());
 		
-		toReturn.setOperations(operations);
+		//toReturn.setOperations(operations);
 		
 		toReturn.setSeries(Arrays.asList("Price", "SMA(200)", "MAX200", "MIN200"));
 		toReturn.setSeriesVoting(Arrays.asList("SCORE"));

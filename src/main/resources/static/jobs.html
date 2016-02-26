@@ -1,33 +1,55 @@
-<div>
- <form>
-	 <div class="form-group">
-	 	<label for="stockselect">SelectStock:</label>
-		<select id="stockselect" ng-options="stock as stock.label for stock in stocks" ng-model="myForm.targetStock"></select>
-	 </div>
-	 <div class="form-group">
-	 	<label for="top_loss_perc">Stop loss percentage (below SMA):</label>
-	  	<input type="number" class="form-control" id="top_loss_perc" ng-model="myForm.stop_loss_perc" min="0" max="100">  
-	 </div>
-	 <div class="form-group">
- 	 	<label for="take_profit_perc">Take profit percentage:</label>
-		<input type="number"   class="form-control" id="take_profit_perc" ng-model="myForm.take_profit_perc" min="0" max="100"> 
-	 </div>
-	 <button  class="btn btn-default" ng-click="myForm.submitTheForm()">Run job</button>
- </form>
+<div layout="row" layout-fill>
+
+	<div class="zero" layout-align="top center">
+	  <h3>Job Configuration</h3>
+	  <br>
+	 <form>
+		 <div class="form-group" >
+		 	<label for="stockselect">Select a stock:</label>
+			<select class="form-control" id="stockselect" ng-options="stock as stock.label for stock in stocks" ng-model="myForm.targetStock"></select>
+		 </div>
+		 <div class="form-group" width="50%">
+		 	<label for="top_loss_perc">Stop loss percentage (below SMA):</label>
+		  	<input type="number" class="form-control" id="top_loss_perc" ng-model="myForm.stop_loss_perc" min="0" max="100">  
+		 </div>
+		 <div class="form-group">
+	 	 	<label for="take_profit_perc">Take profit percentage:</label>
+			<input type="number"   class="form-control" id="take_profit_perc" ng-model="myForm.take_profit_perc" min="0" max="100"> 
+		 </div>
+		  <div class="form-group">
+	 	 	<label for="take_profit_perc">Time window for SMA (days)</label>
+			<input type="number"   class="form-control" id="sma_sliding_window" ng-model="myForm.sma_sliding_window" min="0" max="200"> 
+		 </div>
+		 <button  class="btn btn-default" ng-click="myForm.submitTheForm()">Run job</button>
+	 </form>
+	
+	</div>
+
+	<div class="one" layout-align="top center"  layout-fill>
+		  
+		  <h3>Results</h3>
+		  <md-list ng-cloak>
+		    
+		       <md-list-item>
+			       	<p><strong>Open Price</strong></p>
+			       	<p><strong>Close Price</strong></p>
+			       	<p><strong>Date Range</strong></p>
+			       	<p><strong>SMA Inc</strong></p>
+			       	<p><strong>Yield</strong></p>
+		       	</md-list-item>
+		    	
+			  <md-list-item ng-repeat="pos in positions">
+			  
+    				<p> {{pos.openingOperation.price | number:2 }} </p>
+    				<p> {{pos.closingOperation.price| number:2}} </p>
+    				<p>{{ pos.openingOperation.date | date }} to {{ pos.closingOperation.date | date }}</p>
+    				<p>{{ pos.openingOperation.smaInclination * 100|number:2}}% to {{ pos.closingOperation.smaInclination * 100|number:2}}%</p>
+    				<td>{{ pos.yield | number:2 }}%</td>
+  			</md-list-item>
+ 			<md-divider></md-divider>
+		</md-list>
+
+	</div>
 </div>
 
-<br />
-<div>
-	<table class="table" border="1" width="250" align="center">
-	  <tr>
-	  	<th>Operation Type</th>
-	  	<th>Price</th>
-	  	<th>Date</th>
-	  </tr>
-	  <tr ng-repeat="op in operations">
-	    <td>{{ op.type }}</td>
-	    <td>{{ op.price | number:2 }}</td>
-	    <td>{{ op.date | date }}</td>
-	  </tr>
-	</table>
-</div>
+

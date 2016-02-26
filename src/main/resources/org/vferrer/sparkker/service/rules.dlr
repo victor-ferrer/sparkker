@@ -2,7 +2,6 @@ package org.vferrer.sparkker.kie.rules
 
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
 import org.vferrer.sparkker.service.facts.TradingSession;
-import org.vferrer.sparkker.service.facts.StockRuleData;
 
 //global TradingSession session;
 
@@ -76,7 +75,7 @@ when
 	// Buy if score is positive and distance to SMA < 5%
 	eval($todayScore > 0 && (($stockData.getValue() / $sma200d) < 1.05d))
 then
-    modify( $session ) { addOperation("BUY",$stockData.getTimestamp(),$stockData.getValue(),$todayScore) };
+    modify( $session ) { openPosition($stockData.getStock(), $stockData.getTimestamp(), $stockData.getValue(), $todayScore) };
 end
 
 
@@ -93,7 +92,7 @@ when
 	// Sell if score is negative or distance to opening > 15%	
 	eval($todayScore < 0d  || (($stockData.getValue() / $opening) > 1.15d))
 then
-	modify( $session ) { addOperation("SELL",$stockData.getTimestamp(),$stockData.getValue(),$todayScore) };
+	modify( $session ) { closePosition($stockData.getTimestamp(), $stockData.getValue(),$todayScore) };
 end
 
 rule "CLEAN_RULE"
@@ -101,9 +100,14 @@ salience -100
 dialect "java"
 when
 	$stockData : AnalizedStockQuotation()
+	$session   : TradingSession()
 	
 	eval(true)
 then
+	// Store for statistical processing
+	modify ( $session ) { processStatistics($stockData) };
+	
+	// Remove the stock from the session once processed
 	retract($stockData);
 end
 
