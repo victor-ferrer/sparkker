@@ -116,7 +116,6 @@ public class SparkkerController {
 		Collections.reverse(quotations);
 		
 		// Run the business rules over the data + indicators
-		// Run the business rules over the data + indicators
 		List<Position> positions = droolsService.executeRules(quotations);
 		
 		// Build the chart data

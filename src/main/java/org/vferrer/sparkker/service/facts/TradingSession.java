@@ -34,7 +34,7 @@ public class TradingSession
 		
 		Operation openiningOperation = new Operation("BUY", date, price, score);
 		
-		
+		// FIXME
 		openiningOperation.setSmaInclination(getSMA200Steepness(200));
 		
 		positionList.getLast().open(openiningOperation );
@@ -46,6 +46,7 @@ public class TradingSession
 		
 		Operation closingOperation = new Operation("SELL", date, price, score);
 		
+		// FIXME
 		closingOperation.setSmaInclination(getSMA200Steepness(200));
 		
 		positionList.getLast().close(closingOperation );

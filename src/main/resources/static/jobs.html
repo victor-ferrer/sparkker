@@ -23,6 +23,13 @@
 		 <button  class="btn btn-default" ng-click="myForm.submitTheForm()">Run job</button>
 	 </form>
 	
+		<br>
+		<div ng-show="positions.length">
+		  	<h3>Job Results</h3>
+			<h4>Number of positions: {{positions.length}} </h4>
+			<h4>Total yield: {{getTotalYield()| number:2}}% </h4>
+		</div>
+	
 	</div>
 
 	<div class="one" layout-align="top center"  layout-fill>

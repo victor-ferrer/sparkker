@@ -27,6 +27,16 @@ angular.module('sparkker', [ 'ngRoute','chart.js','ngMaterial' ])
     $scope.myForm = {};
     $scope.myForm.stop_loss_perc  = "3";
     $scope.myForm.take_profit_perc  = "15";
+    
+    $scope.getTotalYield = function(){
+        var total = 0;
+        for(var i = 0; i < $scope.positions.length; i++){
+            var pos = $scope.positions[i];
+            total += (pos.yield);
+        }
+        return total;
+    }
+    
 	$scope.stocks = [
 	                 {
 	                    label: 'Abertis Infrastructuras',
