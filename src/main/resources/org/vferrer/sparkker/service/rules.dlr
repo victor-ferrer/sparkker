@@ -73,7 +73,7 @@ when
 	$sma200d    : Double() from  $stockData.getIndicator("SMA").value	
 	
 	// Buy if score is positive and distance to SMA < 5%
-	eval($todayScore > 0 && (($stockData.getValue() / $sma200d) < 1.05d))
+	eval($todayScore > 0 && (($stockData.getValue() / $sma200d) < ((100d + $session.getStopLossPerc())/100d)))
 then
     modify( $session ) { openPosition($stockData.getStock(), $stockData.getTimestamp(), $stockData.getValue(), $todayScore) };
 end
@@ -89,8 +89,8 @@ when
 	$todayScore : Double () from $stockData.getIndicator("SCORE").value
 	$opening    : Double() from  $session.getOpeningPrice()
 	
-	// Sell if score is negative or distance to opening > 15%	
-	eval($todayScore < 0d  || (($stockData.getValue() / $opening) > 1.15d))
+	// Sell if score is negative or distance to opening > TAKE_PROFIT	
+	eval($todayScore < 0d  || (($stockData.getValue() / $opening) > ((100d + $session.getTakeProfitPerc())/100d)))
 then
 	modify( $session ) { closePosition($stockData.getTimestamp(), $stockData.getValue(),$todayScore) };
 end

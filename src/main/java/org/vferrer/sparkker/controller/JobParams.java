@@ -14,6 +14,8 @@ public class JobParams implements Serializable{
 	private String stopLossPerc;
 	
 	private String takeProfitPerc;
+	
+	private String smaWindow;
 
 	public String getTargetStock() {
 		return targetStock;
@@ -38,6 +40,12 @@ public class JobParams implements Serializable{
 	public void setTakeProfitPerc(String takeProfitPerc) {
 		this.takeProfitPerc = takeProfitPerc;
 	}
-	
-	
+
+	public String getSmaWindow() {
+		return smaWindow;
+	}
+
+	public void setSmaWindow(String smaWindow) {
+		this.smaWindow = smaWindow;
+	}
 }

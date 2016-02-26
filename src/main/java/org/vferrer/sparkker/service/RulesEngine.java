@@ -6,6 +6,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.vferrer.sparkker.controller.JobParams;
 import org.vferrer.sparkker.service.facts.Position;
 import org.vferrer.sparkker.service.facts.TradingSession;
 import org.vferrer.sparkker.service.indicators.ScoreIndicator;
@@ -22,13 +23,20 @@ public class RulesEngine {
 	@Autowired
 	private KieContainer kieContainer;
 
-	public List<Position> executeRules(List<AnalizedStockQuotation> quotations) throws Exception {
+	@Autowired
+	private JobParams defaultParams;
+	
+	public List<Position> executeRules(List<AnalizedStockQuotation> quotations, JobParams jobConfig) throws Exception {
 
 		// Init session and global variables
 		KieSession kSession = kieContainer.newKieSession();
 
+		if (jobConfig == null){
+			jobConfig = defaultParams;
+		}
+		
 		// Placeholder for operations and statistics
-		TradingSession session = new TradingSession();
+		TradingSession session = new TradingSession(jobConfig);
 		kSession.insert(session);
 
 		quotations.forEach(quot -> quot.getIndicators().put("SCORE", new ScoreIndicator()));

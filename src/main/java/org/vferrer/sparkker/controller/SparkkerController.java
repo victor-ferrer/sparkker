@@ -74,7 +74,7 @@ public class SparkkerController {
 		Collections.reverse(quotations);
 		
 		// Run the business rules over the data + indicators
-		List<Position> operations = droolsService.executeRules(quotations);
+		List<Position> operations = droolsService.executeRules(quotations,null);
 		
 		for (Position position : operations) {
 			System.out.println(String.format("BUY: Price: %s Date: %s Score: %s ",
@@ -104,7 +104,7 @@ public class SparkkerController {
 		List<StockQuotationJPA> stocks = useOnlineFeed ? loadQuotesFromStokker(jobConfig.getTargetStock()):loadQuotesFromFile(jobConfig.getTargetStock());
 
 		// Set up the analysis job
-		int windowSize = 200;
+		int windowSize = Integer.parseInt(jobConfig.getSmaWindow());
 		Set<Indicator> indicators = new HashSet<>();
 		indicators.add(IndicatorsFactory.max(Granularity.DAY, windowSize));
 		indicators.add(IndicatorsFactory.sma(Granularity.DAY, windowSize));
@@ -116,7 +116,7 @@ public class SparkkerController {
 		Collections.reverse(quotations);
 		
 		// Run the business rules over the data + indicators
-		List<Position> positions = droolsService.executeRules(quotations);
+		List<Position> positions = droolsService.executeRules(quotations, jobConfig);
 		
 		// Build the chart data
 		final ChartData toReturn = new ChartData();

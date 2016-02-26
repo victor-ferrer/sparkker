@@ -25,8 +25,9 @@ angular.module('sparkker', [ 'ngRoute','chart.js','ngMaterial' ])
 .controller('jobsController', function($scope, $http) 
 {
     $scope.myForm = {};
-    $scope.myForm.stop_loss_perc  = "3";
-    $scope.myForm.take_profit_perc  = "15";
+    $scope.myForm.stop_loss_perc  = 3;
+    $scope.myForm.take_profit_perc  = 15;
+    $scope.myForm.sma_sliding_window = 200;
     
     $scope.getTotalYield = function(){
         var total = 0;
@@ -69,7 +70,8 @@ angular.module('sparkker', [ 'ngRoute','chart.js','ngMaterial' ])
     var jobConfig = {
        stopLossPerc : $scope.myForm.stop_loss_perc,
        takeProfitPerc  : $scope.myForm.take_profit_perc,
-       targetStock : $scope.myForm.targetStock.ticker
+       targetStock : $scope.myForm.targetStock.ticker,
+       smaWindow : $scope.myForm.sma_sliding_window
     };
     console.log("--> Submitting form"+ JSON.stringify(jobConfig));
 

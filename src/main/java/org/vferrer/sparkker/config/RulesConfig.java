@@ -11,6 +11,7 @@ import org.kie.api.runtime.KieContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.vferrer.sparkker.controller.JobParams;
 
 @Configuration
 public class RulesConfig {
@@ -39,4 +40,16 @@ public class RulesConfig {
 
         return kieContainer;
     }
+    
+    @Bean
+    public JobParams defaultJobParams() {
+    	
+    	JobParams toReturn = new JobParams();
+    	toReturn.setSmaWindow("200");
+    	toReturn.setStopLossPerc("3");
+    	toReturn.setTakeProfitPerc("15");
+		return toReturn;
+    }
+    
+    
 }

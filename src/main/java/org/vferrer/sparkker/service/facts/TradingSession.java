@@ -6,8 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.Period;
+import org.vferrer.sparkker.controller.JobParams;
 import org.vferrer.sparkker.service.facts.Position.Mode;
 import org.vferrer.sparkker.service.facts.Position.Status;
 import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
@@ -19,11 +18,18 @@ public class TradingSession
 {
 	private LinkedList<Position> positionList;
 	private LinkedList<AnalizedStockQuotation> quotationList;
+	private Double slidingWindow;
+	private Double stopLossPerc;
+	private Double takeProfitPerc;
 	
-	public TradingSession(){
+	public TradingSession(JobParams jobConfig){
 		positionList = new LinkedList<>();
 		quotationList = new LinkedList<>();
+		slidingWindow = Double.parseDouble(jobConfig.getSmaWindow());
+		stopLossPerc = Double.parseDouble(jobConfig.getStopLossPerc());
+		takeProfitPerc = Double.parseDouble(jobConfig.getTakeProfitPerc());
 	}
+	
 	
 	
 	public void openPosition(String stock, Date date, Double price, Double score)
@@ -139,7 +145,19 @@ public class TradingSession
 		
 		return Arrays.asList(0d);
 	}
-	
-	
+
+	public Double getTakeProfitPerc() {
+		return takeProfitPerc;
+	}
+
+	public Double getStopLossPerc() {
+		return stopLossPerc;
+	}
+
+
+	public Double getSlidingWindow() {
+		return slidingWindow;
+	}
+
 	
 }
