@@ -14,14 +14,10 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import org.vferrer.sparkker.service.AnalyzeService;
 import org.vferrer.sparkker.service.RulesEngine;
 import org.vferrer.sparkker.service.facts.Operation;
@@ -31,24 +27,18 @@ import org.vferrer.sparkker.stokker.AnalizedStockQuotation;
 import org.vferrer.sparkker.stokker.Indicator;
 import org.vferrer.sparkker.stokker.Indicator.Granularity;
 import org.vferrer.sparkker.stokker.StockQuotationJPA;
-import org.vferrer.sparkker.stokker.StockQuotationJPAPagedResources;
+import org.vferrer.sparkker.stokker.StokkerClient;
 
 import com.clearspring.analytics.util.Lists;
 
 @RestController
 public class SparkkerController {
 
-	// @Autowired
-	// private StokkerClient stokkerClient;
-
 	@Autowired
-	RestTemplate rt;
-	
+	private StokkerClient stokkerClient;
+
 	@Autowired
 	RulesEngine droolsService;
-
-	@Value("${eureka.client.serviceUrl.defaultZone}")
-	String baseEurekaPath;
 
 	@Autowired
 	private AnalyzeService analyzeService;
@@ -168,31 +158,7 @@ public class SparkkerController {
 	 * @return
 	 */
 	private List<StockQuotationJPA> loadQuotesFromStokker(String ticker) {
-		
-		// FIXME extract this to a configuration parameter
-		String url = String.format("http://localhost:8989/stockQuotationJPAs/search/findValueByStock?ticker=%s",ticker);
-
-		try {
-			ResponseEntity<StockQuotationJPAPagedResources> response = rt.getForEntity(url,
-					StockQuotationJPAPagedResources.class);
-
-			System.out.println(response.getStatusCode());
-
-			if (HttpStatus.OK != response.getStatusCode()) {
-				System.out.println("Error retrieving the stock quotations: " + response.getStatusCode());
-				return null;
-			}
-
-			List<StockQuotationJPA> stocks = new ArrayList<>(response.getBody().getContent());
-			
-			return stocks;
-		}
-
-		catch (RestClientException rex) {
-			System.out.println("Error retrieving the stock quotations: " + rex.getMessage());
-			return null;
-		}
-
+		return new ArrayList<>(stokkerClient.getAllStockQuotations(ticker).getContent());
 	}
 
 	/**
