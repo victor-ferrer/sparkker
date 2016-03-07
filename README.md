@@ -15,6 +15,21 @@ This is a snapshot of the current user interface showing a Stock being plotted a
 
 ![UI Screenshot](https://raw.githubusercontent.com/victor-ferrer/sparkker/master/ui_screenshot.PNG)
 
+## How to launch it
+There are several ways to run the program:
+- *Data acquisition*: You can either get the data from Stokker or from a set of sample files within Sparkker.
+-- If you want to use [Stokker](https://github.com/victor-ferrer/stokker) as data source you need to run it along with the [Portfolio Manager](https://github.com/victor-ferrer/stokker-portfolio-manager) (which act as discovery server).
+-- If this is too much a fuzz for you, use this parameter to run offline (using the sample files):
+--- --data.feed.online=false
+
+- *Drools rules file*: Also, you will need to specify the path to the Drools Rules file (which you can edit with a text editor and check the results without recompiling)
+-- --rules.file.path=../rules.dlr 
+
+So, a line command execution will look like this:
+
+java -jar sparkker-0.0.1-SNAPSHOT.jar --rules.file.path=../rules.dlr --data.feed.online=false
+
+
 ## Technology stack
 - Spring Boot 1.3.3 in the Server Side.
 - Apache Spark 
@@ -24,7 +39,6 @@ This is a snapshot of the current user interface showing a Stock being plotted a
 
 ## Status
 This is work in progress:
-- Updated libraries - Startup succesfull with Eureka but still can´t register.
 - Stocks might be retrieved from Stokker or from a set of sample files
 - SMA, MAX, MIN indicators are calculated and represented in a graph.
 - A secondary SCORE indicator is calculated based on the other indicators and a BUY/SELL recomendation is given.
